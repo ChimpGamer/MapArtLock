@@ -25,6 +25,8 @@ java {
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.release.set(25)
+    // Surfaces deprecated Bukkit API that Paper has a supported replacement for.
+    options.compilerArgs.addAll(listOf("-Xlint:deprecation", "-Xlint:unchecked"))
 }
 
 tasks {

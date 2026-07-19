@@ -1,8 +1,34 @@
-open-on-right-click: true
-enable-glint: true
-show-owner-in-lore: true
-block-anvil: true
-block-crafting: true
-block-cartography: true
-block-crafter: true
-admin-bypass-protection: false
+# MapArtLock
+#
+# The lock lives in the persistent data container of the map itself. There is no storage
+# file, nothing held in memory and nothing to keep in sync: protection travels with the
+# item into chests, shulkers and backups on its own.
+#
+# Note that protection follows the item, not the artwork. Anyone who can run /give makes
+# an unprotected copy — but with those powers they could disable this plugin anyway.
+#
+# Item frames are deliberately not protected: whoever holds the map may hang it and take
+# it down. That keeps map art tradeable, since ownership does not transfer with the item.
+
+menu:
+  # Sneak + right click on a filled map opens the menu.
+  # Sneak is deliberate: a plain right click is what puts a map into an item frame.
+  open-on-sneak-right-click: true
+
+appearance:
+  glint: true
+  show-owner-in-lore: true
+
+protection:
+  anvil: true
+  crafting-table: true
+  cartography-table: true
+  crafter: true
+  hoppers: true
+
+admin:
+  # Whether mapartlock.bypass does anything at all. On false the protection is absolute,
+  # including for administrators.
+  bypass-enabled: true
+  # Logs lock and unlock actions to the console.
+  log-actions: true

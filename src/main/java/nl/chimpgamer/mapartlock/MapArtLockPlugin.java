@@ -1,71 +1,45 @@
 package nl.chimpgamer.mapartlock;
 
-import nl.chimpgamer.mapartlock.command.MapArtCommand;
-import nl.chimpgamer.mapartlock.config.MessageService;
-import nl.chimpgamer.mapartlock.config.PluginSettings;
-import nl.chimpgamer.mapartlock.listener.MapLockMenuListener;
-import nl.chimpgamer.mapartlock.listener.MapProtectionListener;
-import nl.chimpgamer.mapartlock.listener.PlayerMapInteractListener;
-import nl.chimpgamer.mapartlock.listener.ProtectedInventoryListener;
-import nl.chimpgamer.mapartlock.menu.MapLockMenu;
-import nl.chimpgamer.mapartlock.permission.MapLockPermissions;
-import nl.chimpgamer.mapartlock.service.MapLockService;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import nl.chimpgamer.mapartlock.config.Messages;
+import nl.chimpgamer.mapartlock.config.Settings;
+import nl.chimpgamer.mapartlock.item.MapDecorator;
+import nl.chimpgamer.mapartlock.listener.InventoryProtectionListener;
+import nl.chimpgamer.mapartlock.listener.MenuListener;
+import nl.chimpgamer.mapartlock.lock.MapLockService;
+import nl.chimpgamer.mapartlock.menu.LockMenu;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Locks live on the map items themselves, so there is nothing to load on startup, nothing to
+ * flush on shutdown and no state held between the two.
+ */
 public final class MapArtLockPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
 
-        PluginSettings settings = new PluginSettings(getConfig());
-        MessageService messages = new MessageService(this);
-        MapLockService mapLockService = new MapLockService(settings);
-        MapLockMenu menu = new MapLockMenu(mapLockService, messages);
+        Settings settings = new Settings(this);
+        Messages messages = new Messages(this);
 
-        PluginManager pluginManager = getServer().getPluginManager();
-        registerPermissions(pluginManager);
-        registerCommand("mapart", "Open de MapArtLock GUI.", List.of(), new MapArtCommand(this, settings, menu, mapLockService, messages));
+        MapDecorator decorator = new MapDecorator(this, settings, messages);
+        MapLockService service = new MapLockService(this, settings, decorator);
+        LockMenu menu = new LockMenu(service, messages);
 
-        pluginManager.registerEvents(new PlayerMapInteractListener(settings, mapLockService, menu, messages), this);
-        pluginManager.registerEvents(new MapLockMenuListener(this, mapLockService, menu, messages), this);
-        pluginManager.registerEvents(new MapProtectionListener(settings, mapLockService), this);
-        pluginManager.registerEvents(new ProtectedInventoryListener(settings, mapLockService, messages), this);
+        registerCommand("mapartlock", plainText(messages.render("command_description")), List.of(),
+                new MapArtLockCommand(this, settings, messages, menu));
 
-        getLogger().info("MapArtLock is ingeschakeld.");
+        PluginManager plugins = getServer().getPluginManager();
+        plugins.registerEvents(new MenuListener(this, settings, service, menu, messages), this);
+        plugins.registerEvents(new InventoryProtectionListener(settings, service, messages), this);
     }
 
-    private void registerPermissions(PluginManager pluginManager) {
-        addPermission(pluginManager, new Permission(
-                MapLockPermissions.USER,
-                "Userrechten: /mapart openen, right-click GUI openen en eigen mapart locken/unlocken.",
-                PermissionDefault.FALSE
-        ));
-        addPermission(pluginManager, new Permission(
-                MapLockPermissions.ADMIN,
-                "Adminrechten: andermans mapart locken/unlocken en /mapart version plus /mapart reload gebruiken.",
-                PermissionDefault.OP,
-                children(MapLockPermissions.USER)
-        ));
-    }
-
-    private Map<String, Boolean> children(String... permissionNodes) {
-        Map<String, Boolean> children = new LinkedHashMap<>();
-        for (String permissionNode : permissionNodes) {
-            children.put(permissionNode, true);
-        }
-        return children;
-    }
-
-    private void addPermission(PluginManager pluginManager, Permission permission) {
-        if (pluginManager.getPermission(permission.getName()) == null) {
-            pluginManager.addPermission(permission);
-        }
+    /** The command description is shown in /help, so it belongs in messages.yml like other player-facing text. */
+    private static String plainText(Component component) {
+        return PlainTextComponentSerializer.plainText().serialize(component);
     }
 }

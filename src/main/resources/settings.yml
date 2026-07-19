@@ -1,7 +1,0 @@
-map-art-lock:
-  enabled: true
-  costs:
-    default: 1000
-    admin: 5
-
-config-version: 1
