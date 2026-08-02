@@ -4,7 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import nl.chimpgamer.mapartlock.config.Messages;
 import nl.chimpgamer.mapartlock.config.Settings;
-import nl.chimpgamer.mapartlock.item.MapDecorator;
+import nl.chimpgamer.mapartlock.item.MapLore;
 import nl.chimpgamer.mapartlock.listener.InventoryProtectionListener;
 import nl.chimpgamer.mapartlock.listener.MenuListener;
 import nl.chimpgamer.mapartlock.lock.MapLockService;
@@ -26,8 +26,8 @@ public final class MapArtLockPlugin extends JavaPlugin {
         Settings settings = new Settings(this);
         Messages messages = new Messages(this);
 
-        MapDecorator decorator = new MapDecorator(this, settings, messages);
-        MapLockService service = new MapLockService(this, settings, decorator);
+        MapLore lore = new MapLore(settings, messages);
+        MapLockService service = new MapLockService(this, settings, lore);
         LockMenu menu = new LockMenu(service, messages);
 
         registerCommand("mapartlock", plainText(messages.render("command_description")), List.of(),

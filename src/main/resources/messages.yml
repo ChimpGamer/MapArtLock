@@ -21,7 +21,9 @@ usage_admin: "<prefix><yellow>Gebruik:</yellow> <gold>/mapartlock</gold><yellow>
 config_reloaded: "<prefix><yellow>Configuratie en berichten zijn herladen.</yellow><newline><gray>Bescherming:</gray> <yellow><protections></yellow>"
 command_description: "Beheer de bescherming van map art."
 
-# Lore op een beschermde kaart.
+# Lore op een beschermde kaart. Deze regels worden opnieuw opgebouwd om ze bij
+# unlock weg te halen: pas je ze aan terwijl er beschermde kaarten rondgaan, dan
+# houden die hun oude regels tot ze opnieuw beschermd worden.
 lore:
   header: "<gold>MapArt Protection</gold>"
   status: "<gray>Status: <green>Beschermd</green></gray>"

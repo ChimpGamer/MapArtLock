@@ -70,7 +70,12 @@ public final class MenuListener implements Listener {
         menu.open(event.getPlayer());
     }
 
-    /** Every action closes the menu, which is what keeps players from flooding chat and the log. */
+    /**
+     * A click that actually locks or unlocks closes the menu; a click that changed nothing
+     * (already locked, already unlocked) leaves it open with just a message. Closing only on a
+     * real change keeps the menu from flooding chat and the log, without slamming shut on a
+     * player who clicked a button that had nothing to do.
+     */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if (!(event.getInventory().getHolder() instanceof LockMenu.Holder holder)) {
@@ -98,9 +103,11 @@ public final class MenuListener implements Listener {
                 ? service.lock(held, player)
                 : service.unlock(held, player);
 
-        player.closeInventory();
         messages.send(player, outcome.messageKey());
-        log(player, holder.mapId(), outcome);
+        if (outcome.changedState()) {
+            player.closeInventory();
+            log(player, holder.mapId(), outcome);
+        }
     }
 
     @EventHandler
