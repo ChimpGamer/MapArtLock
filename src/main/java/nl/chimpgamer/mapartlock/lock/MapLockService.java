@@ -111,6 +111,9 @@ public final class MapLockService {
             container.set(lockedAtKey, PersistentDataType.LONG, lock.lockedAt().getEpochSecond());
         });
         lore.apply(itemStack, ownerName(lock.owner()));
+        if (settings.glint()) {
+            itemStack.editMeta(meta -> meta.setEnchantmentGlintOverride(true));
+        }
         return LockOutcome.LOCKED;
     }
 
@@ -132,6 +135,7 @@ public final class MapLockService {
             container.remove(ownerKey);
             container.remove(lockedAtKey);
         });
+        itemStack.editMeta(meta -> meta.setEnchantmentGlintOverride(null));
         return LockOutcome.UNLOCKED;
     }
 

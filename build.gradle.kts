@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "nl.chimpgamer"
-version = "1.1.9"
+version = "1.2.5"
 
 repositories {
     mavenCentral()
