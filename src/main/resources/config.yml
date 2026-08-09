@@ -19,7 +19,6 @@ menu:
   open-on-sneak-right-click: true
 
 appearance:
-  glint: true
   show-owner-in-lore: true
 
 protection:
