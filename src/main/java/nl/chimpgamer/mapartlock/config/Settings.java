@@ -20,6 +20,10 @@ public final class Settings {
         return flag("menu.open-on-sneak-right-click");
     }
 
+    public boolean glint() {
+        return flag("appearance.glint");
+    }
+
     public boolean showOwnerInLore() {
         return flag("appearance.show-owner-in-lore");
     }
