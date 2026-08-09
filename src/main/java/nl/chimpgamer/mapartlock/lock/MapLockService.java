@@ -4,7 +4,7 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.MapId;
 import nl.chimpgamer.mapartlock.Permissions;
 import nl.chimpgamer.mapartlock.config.Settings;
-import nl.chimpgamer.mapartlock.item.MapDecorator;
+import nl.chimpgamer.mapartlock.item.MapLore;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,23 +23,26 @@ import java.util.UUID;
 /**
  * Every rule about locking, and the only place that touches the item's data.
  *
- * <p>The lock lives on the item itself, which means there is nothing to load, nothing to save
- * and nothing held in memory. Protection is exactly as durable as the item: it travels along
- * into chests, shulkers and backups on its own.
+ * <p>Only two PDC keys are written: {@code owner} and {@code locked_at}. The presence of the
+ * owner is the whole lock — there is no separate "locked" flag. The visible lore is not stored
+ * again in the item's data; it already lives in the item meta, so {@link MapLore} re-renders the
+ * same lines to remove them rather than keeping a duplicate copy.
  *
- * <p>The trade-off is that protection follows the item rather than the artwork. Somebody who
- * can run {@code /give filled_map[map_id=...]} gets an unprotected copy — but that requires
- * powers with which they could also disable this plugin outright.
+ * <p>The lock lives on the item itself, so there is nothing to load, nothing to save and nothing
+ * held in memory. Protection is as durable as the item and travels with it into chests and
+ * backups. The trade-off is that it follows the item, not the artwork: whoever can run
+ * {@code /give filled_map[map_id=...]} gets an unprotected copy — but with those powers they
+ * could disable this plugin anyway.
  */
 public final class MapLockService {
     private final Settings settings;
-    private final MapDecorator decorator;
+    private final MapLore lore;
     private final NamespacedKey ownerKey;
     private final NamespacedKey lockedAtKey;
 
-    public MapLockService(Plugin plugin, Settings settings, MapDecorator decorator) {
+    public MapLockService(Plugin plugin, Settings settings, MapLore lore) {
         this.settings = settings;
-        this.decorator = decorator;
+        this.lore = lore;
         this.ownerKey = new NamespacedKey(plugin, "owner");
         this.lockedAtKey = new NamespacedKey(plugin, "locked_at");
     }
@@ -107,7 +110,7 @@ public final class MapLockService {
             container.set(ownerKey, UuidType.INSTANCE, lock.owner());
             container.set(lockedAtKey, PersistentDataType.LONG, lock.lockedAt().getEpochSecond());
         });
-        decorator.markLocked(itemStack, ownerName(lock.owner()));
+        lore.apply(itemStack, ownerName(lock.owner()));
         return LockOutcome.LOCKED;
     }
 
@@ -124,11 +127,11 @@ public final class MapLockService {
             return LockOutcome.NOT_OWNER;
         }
 
+        lore.remove(itemStack, ownerName(existing.get().owner()));
         itemStack.editPersistentDataContainer(container -> {
             container.remove(ownerKey);
             container.remove(lockedAtKey);
         });
-        decorator.clear(itemStack);
         return LockOutcome.UNLOCKED;
     }
 

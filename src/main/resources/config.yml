@@ -1,8 +1,11 @@
 # MapArtLock
 #
-# The lock lives in the persistent data container of the map itself. There is no storage
-# file, nothing held in memory and nothing to keep in sync: protection travels with the
-# item into chests, shulkers and backups on its own.
+# The lock lives in the persistent data container of the map itself, as just an owner and a
+# timestamp. There is no storage file and nothing held in memory: protection travels with
+# the item into chests, shulkers and backups on its own.
+#
+# The lore shown below is not stored a second time anywhere — it is re-rendered from
+# messages.yml to remove it again on unlock, so it is not kept in sync with a copy.
 #
 # Note that protection follows the item, not the artwork. Anyone who can run /give makes
 # an unprotected copy — but with those powers they could disable this plugin anyway.
@@ -16,7 +19,6 @@ menu:
   open-on-sneak-right-click: true
 
 appearance:
-  glint: true
   show-owner-in-lore: true
 
 protection:
