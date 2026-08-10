@@ -26,6 +26,7 @@ import java.util.logging.Level;
 public final class Messages {
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final String PREFIX_KEY = "prefix";
+    private static final String MESSAGES_FILE = "messages.yml";
 
     private final Plugin plugin;
     private final File file;
@@ -34,9 +35,9 @@ public final class Messages {
 
     public Messages(Plugin plugin) {
         this.plugin = plugin;
-        this.file = new File(plugin.getDataFolder(), "messages.yml");
+        this.file = new File(plugin.getDataFolder(), MESSAGES_FILE);
         if (!file.exists()) {
-            plugin.saveResource("messages.yml", false);
+            plugin.saveResource(MESSAGES_FILE, false);
         }
         reload();
     }
@@ -72,13 +73,13 @@ public final class Messages {
     }
 
     private FileConfiguration loadBundled() {
-        try (InputStream stream = plugin.getResource("messages.yml")) {
+        try (InputStream stream = plugin.getResource(MESSAGES_FILE)) {
             if (stream == null) {
                 return new YamlConfiguration();
             }
             return YamlConfiguration.loadConfiguration(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (IOException exception) {
-            plugin.getLogger().log(Level.WARNING, "Could not load the bundled messages.yml", exception);
+            plugin.getLogger().log(Level.WARNING, "Could not load the bundled " + MESSAGES_FILE, exception);
             return new YamlConfiguration();
         }
     }
