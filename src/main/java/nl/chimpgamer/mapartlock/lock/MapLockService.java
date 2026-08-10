@@ -75,7 +75,7 @@ public final class MapLockService {
         try {
             UUID owner = container.get(ownerKey, UuidType.INSTANCE);
             return owner == null ? Optional.empty() : Optional.of(new MapLock(owner, Instant.ofEpochSecond(lockedAt)));
-        } catch (IllegalArgumentException malformed) {
+        } catch (IllegalArgumentException _) {
             return Optional.empty();
         }
     }
